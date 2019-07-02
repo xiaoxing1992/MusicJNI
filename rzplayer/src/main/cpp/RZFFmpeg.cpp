@@ -6,7 +6,7 @@
 #include "RZFFmpeg.h"
 
 
-RZFFmpeg::RZFFmpeg(RzPlayStatus *status,RZJNICall *rzjniCall, const char *url) {
+RZFFmpeg::RZFFmpeg(RzPlayStatus *status, RZJNICall *rzjniCall, const char *url) {
     this->rzPlayStatus = status;
     this->rzjniCall = rzjniCall;
     this->url = url;
@@ -139,10 +139,10 @@ void RZFFmpeg::start() {
     if (rzAudio == NULL) {
         return;
     }
-
+    rzAudio->play();
 
     int index = 0;
-    while (rzPlayStatus!=NULL&&!rzPlayStatus->exit) {
+    while (rzPlayStatus != NULL && !rzPlayStatus->exit) {
         AVPacket *avPacket = av_packet_alloc();
         if (av_read_frame(avFormatContext, avPacket) == 0) {
             if (rzAudio->streamIndex == avPacket->stream_index) {
@@ -175,17 +175,24 @@ void RZFFmpeg::start() {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
-            break;//TODO  break是防止没数据了还在取数据造成死循环
+            while (rzPlayStatus != NULL && !rzPlayStatus->exit) {
+                if (rzAudio->rzQueue->getQueueSize() > 0) {
+                    continue;
+                } else {
+                    rzPlayStatus->exit = true;
+                    break;
+                }
+            }//TODO  break是防止没数据了还在取数据造成死循环
         }
     }
-
-    while (rzAudio->rzQueue->getQueueSize() > 0){
-        AVPacket *avPacket = av_packet_alloc();
-        rzAudio->rzQueue->getAVPacket(avPacket);
-        av_packet_free(&avPacket);
-        av_free(avPacket);
-        avPacket = NULL;
-    }
+//
+//    while (rzAudio->rzQueue->getQueueSize() > 0){
+//        AVPacket *avPacket = av_packet_alloc();
+//        rzAudio->rzQueue->getAVPacket(avPacket);
+//        av_packet_free(&avPacket);
+//        av_free(avPacket);
+//        avPacket = NULL;
+//    }
     LOGE("解码完成");
 //
 //    rzjniCall->jniEnv->ReleaseByteArrayElements(jPcmDataArray, jPcmData, 0);

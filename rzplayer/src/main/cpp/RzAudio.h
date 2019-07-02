@@ -23,7 +23,11 @@ public:
 
 public:
     RzAudio(RzPlayStatus *rzPlayStatu);
+
     ~RzAudio();
+
+public:
+    void play();
 };
 
 
