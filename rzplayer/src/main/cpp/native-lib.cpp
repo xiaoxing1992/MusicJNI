@@ -6,6 +6,7 @@
 
 RZJNICall *rzjniCall = NULL;
 RZFFmpeg *rzfFmpeg = NULL;
+RzPlayStatus *rzPlayStatus = NULL;
 
 JavaVM *javaVM = NULL;
 
@@ -28,7 +29,8 @@ Java_com_rzplayer_RzPlayer_jniPrepared(JNIEnv *env, jobject instance, jstring ur
         if (rzjniCall == NULL) {
             rzjniCall = new RZJNICall(env, javaVM, &instance);
         }
-        rzfFmpeg = new RZFFmpeg(rzjniCall, url);
+        rzPlayStatus = new RzPlayStatus();
+        rzfFmpeg = new RZFFmpeg(rzPlayStatus,rzjniCall, url);
         rzfFmpeg->prepare();
     }
 //    env->ReleaseStringUTFChars(url_, url);

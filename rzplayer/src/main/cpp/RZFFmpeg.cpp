@@ -6,7 +6,8 @@
 #include "RZFFmpeg.h"
 
 
-RZFFmpeg::RZFFmpeg(RZJNICall *rzjniCall, const char *url) {
+RZFFmpeg::RZFFmpeg(RzPlayStatus *status,RZJNICall *rzjniCall, const char *url) {
+    this->rzPlayStatus = status;
     this->rzjniCall = rzjniCall;
     this->url = url;
 }
@@ -103,7 +104,7 @@ void RZFFmpeg::decodeAudioThread() {
     }
 
     if (rzAudio == NULL) {
-        rzAudio = new RzAudio();
+        rzAudio = new RzAudio(rzPlayStatus);
     }
 
     rzAudio->streamIndex = av_find_best_stream(avFormatContext, AVMediaType::AVMEDIA_TYPE_AUDIO, -1,
@@ -141,19 +142,18 @@ void RZFFmpeg::start() {
 
 
     int index = 0;
-    while(1){
+    while (rzPlayStatus!=NULL&&!rzPlayStatus->exit) {
         AVPacket *avPacket = av_packet_alloc();
-        AVFrame *avFrame = av_frame_alloc();
         if (av_read_frame(avFormatContext, avPacket) == 0) {
             if (rzAudio->streamIndex == avPacket->stream_index) {
                 // 可以写入文件、截取、重采样、解码等等 avPacket.data
-                res = avcodec_send_packet(rzAudio->avCodecContext, avPacket);
-                if (res == 0) {
-                    int receiveFrameRes = avcodec_receive_frame(rzAudio->avCodecContext, avFrame);
-                    if (receiveFrameRes == 0) {
-                        LOGE("解码第 %d 帧", index);
-                        index++;
-                        //TODO
+                index++;
+
+                LOGE("解码第 %d 帧", index);
+
+                rzAudio->rzQueue->putAVPacket(avPacket);
+
+                //TODO
 //                    swr_convert(swrContext, &resampleOutBuffer, avFrame->nb_samples,
 //                                (const uint8_t **) (avFrame->data),
 //                                avFrame->nb_samples);
@@ -165,33 +165,28 @@ void RZFFmpeg::start() {
 //                                                                JNI_COMMIT);
 
 //                    rzjniCall->initWriteAudioTrack(jPcmDataArray, 0, dataSize);
-                        av_packet_free(&avPacket);
-                        av_free(avPacket);
-                        avPacket = NULL;
-                        av_frame_free(&avFrame);
-                        av_free(avFrame);
-                        avFrame = NULL;
-                    }
-                }
 
-            } else{
+            } else {
                 av_packet_free(&avPacket);
                 av_free(avPacket);
                 avPacket = NULL;
-                av_frame_free(&avFrame);
-                av_free(avFrame);
-                avFrame = NULL;
             }
-        } else{
+        } else {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
-            av_frame_free(&avFrame);
-            av_free(avFrame);
-            avFrame = NULL;
+            break;//TODO  break是防止没数据了还在取数据造成死循环
         }
     }
 
+    while (rzAudio->rzQueue->getQueueSize() > 0){
+        AVPacket *avPacket = av_packet_alloc();
+        rzAudio->rzQueue->getAVPacket(avPacket);
+        av_packet_free(&avPacket);
+        av_free(avPacket);
+        avPacket = NULL;
+    }
+    LOGE("解码完成");
 //
 //    rzjniCall->jniEnv->ReleaseByteArrayElements(jPcmDataArray, jPcmData, 0);
 //    rzjniCall->jniEnv->DeleteGlobalRef(jPcmDataArray);

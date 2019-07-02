@@ -4,13 +4,16 @@
 
 #include "RzAudio.h"
 
-RzAudio::RzAudio() {
-
+RzAudio::RzAudio(RzPlayStatus *rzPlayStatu) {
+    this->rzPlayStatus = rzPlayStatu;
+    rzQueue = new RzQueue(rzPlayStatu);
 
 }
 
 RzAudio::~RzAudio() {
 
 }
+
+
 
 

@@ -10,14 +10,19 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+#include "RzQueue.h"
 
 class RzAudio {
 public:
     int streamIndex = -1;
     AVCodecParameters *avCodecParameters = NULL;
     AVCodecContext *avCodecContext = NULL;
+
+    RzQueue *rzQueue = NULL;
+    RzPlayStatus *rzPlayStatus = NULL;
+
 public:
-    RzAudio();
+    RzAudio(RzPlayStatus *rzPlayStatu);
     ~RzAudio();
 };
 

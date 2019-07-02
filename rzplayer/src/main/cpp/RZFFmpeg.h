@@ -24,8 +24,9 @@ public:
     AVFormatContext *avFormatContext = NULL;
     RzAudio *rzAudio = NULL;
     int res = 0;
+    RzPlayStatus *rzPlayStatus = NULL;
 public:
-    RZFFmpeg(RZJNICall *rzjniCall,const char *url);
+    RZFFmpeg(RzPlayStatus *rzPlayStatus,RZJNICall *rzjniCall,const char *url);
 
     ~RZFFmpeg();
 public:
