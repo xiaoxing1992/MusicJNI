@@ -44,32 +44,6 @@ RZFFmpeg::~RZFFmpeg() {
 }
 
 //void RZFFmpeg::play() {
-
-//
-//    AVPacket *avPacket = NULL;
-//    AVFrame *avFrame = NULL;
-//    int index = 0;
-//    int receiveFrameRes = 0;
-//
-//    swrContext = swr_alloc();
-//    AVSampleFormat inSampleFmt = avCodecContext->sample_fmt;
-//    AVSampleFormat outSampleFmt = AV_SAMPLE_FMT_S16;
-//    int inSampleRate = avCodecContext->sample_rate;
-//    int outSampleRate = 44100;
-//    uint64_t inChLayout = avCodecContext->channel_layout;
-//    uint64_t OUTChLayout = AV_CH_LAYOUT_STEREO;
-//
-//    swr_alloc_set_opts(NULL, OUTChLayout, outSampleFmt, outSampleRate, inChLayout, inSampleFmt,
-//                       inSampleRate, 0, NULL);
-//    int outChannelNb = av_get_channel_layout_nb_channels(OUTChLayout);
-//
-//    int dataSize = av_samples_get_buffer_size(NULL, outChannelNb, avCodecContext->frame_size,
-//                                              outSampleFmt, 1);
-//
-//    resampleOutBuffer = static_cast<uint8_t *>(av_malloc(dataSize));
-//
-//    swr_init(swrContext);
-//
 //    jbyteArray jPcmDataArray = rzjniCall->jniEnv->NewByteArray(dataSize);
 //    jbyte *jPcmData = rzjniCall->jniEnv->GetByteArrayElements(jPcmDataArray, NULL);
 //}

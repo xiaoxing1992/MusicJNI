@@ -8,6 +8,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libswresample/swresample.h>
 }
 
 #include "RzQueue.h"
@@ -17,9 +18,14 @@ public:
     int streamIndex = -1;
     AVCodecParameters *avCodecParameters = NULL;
     AVCodecContext *avCodecContext = NULL;
+    AVPacket *avPacket = NULL;
+    AVFrame *avFrame = NULL;
+    SwrContext *swrContext = NULL;
 
     RzQueue *rzQueue = NULL;
     RzPlayStatus *rzPlayStatus = NULL;
+    pthread_t  playThread = NULL;
+    int ret = -1;
 
 public:
     RzAudio(RzPlayStatus *rzPlayStatu);
@@ -28,6 +34,7 @@ public:
 
 public:
     void play();
+    void resampleAudio();
 };
 
 
