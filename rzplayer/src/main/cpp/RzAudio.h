@@ -24,9 +24,10 @@ public:
 
     RzQueue *rzQueue = NULL;
     RzPlayStatus *rzPlayStatus = NULL;
-    pthread_t  playThread = NULL;
+    pthread_t playThread;
     int ret = -1;
-
+    uint8_t *buffer = NULL;
+    int dataSize;
 public:
     RzAudio(RzPlayStatus *rzPlayStatu);
 
@@ -34,7 +35,8 @@ public:
 
 public:
     void play();
-    void resampleAudio();
+
+    int resampleAudio();
 };
 
 
